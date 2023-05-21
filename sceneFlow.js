@@ -10,24 +10,9 @@ class Narrative extends Phaser.Scene {
             targets: fx,
             progress: 1,
             hold: 500,
-            duration: 3000,
-            repeat: -1,
-            onRepeat: () => {
-
-                line++;
-
-                if (line === message.length)
-                {
-                    line = 0;
-                }
-
-                text.setText(message[line]);
-
-                fx.progress = 0;
-
-            }
+            duration: 3000
         });
-        
+
         this.add.text(50, 100, "Click to proceed.").setFontSize(20);
         this.input.on('pointerdown', () => this.scene.start('gameplay'));
     }
