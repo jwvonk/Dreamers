@@ -3,8 +3,8 @@ class Narrative extends Phaser.Scene {
         super('narrative');
     }
     create() {
-        this.text = this.add.text(50, 50, "Blah Blah Blah").setFontSize(50);
-        const fx = this.text.preFX.addReveal();
+        this.text = this.add.text(50, 50, "Blah Blah Blah\nBlah Blah Blah").setFontSize(50);
+        const fx = this.text.preFX.addReveal(.1, 0, 1);
 
         this.tweens.add({
             targets: fx,
@@ -13,7 +13,7 @@ class Narrative extends Phaser.Scene {
             duration: 3000
         });
 
-        this.add.text(50, 100, "Click to proceed.").setFontSize(20);
+        this.add.text(50, 200, "Click to proceed.").setFontSize(20);
         this.input.on('pointerdown', () => this.scene.start('gameplay'));
     }
 }
