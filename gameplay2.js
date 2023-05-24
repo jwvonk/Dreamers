@@ -14,6 +14,11 @@ class Platform extends Phaser.Scene {
         this.h = this.game.config.height;
         this.s = this.game.config.width * 0.01;
 
+        this.add.image(0, 0, 'bg').setOrigin(0, 0).setScale(.5)
+        this.add.image(this.w, 0, 'bg').setOrigin(0, 0).setScale(.5)
+        this.add.image(0, 300, 'bg').setOrigin(0, 0).setScale(.5)
+        this.add.image(this.w, 300, 'bg').setOrigin(0, 0).setScale(.5)
+
         this.cam1 = this.cameras.main;
         this.cam1.setSize(this.w, this.h / 2)
         this.cam1.setBounds(0, 0, this.w * 2, this.h / 2)
@@ -22,13 +27,10 @@ class Platform extends Phaser.Scene {
         this.cam2.scrollY = this.h / 2;
         this.cam2.setBounds(0, this.h/2, this.w * 2, this.h / 2)
 
-        this.add.image(0, 0, 'bg').setOrigin(0, 0).setScale(.5)
-        this.add.image(this.w, 0, 'bg').setOrigin(0, 0).setScale(.5)
-        this.add.image(0, 300, 'bg').setOrigin(0, 0).setScale(.5)
-        this.add.image(this.w, 300, 'bg').setOrigin(0, 0).setScale(.5)
-
         this.border1 = this.physics.add.existing(this.add.rectangle(0, this.h / 2, this.w * 4, 10, 0x000000).setOrigin(0, 1), true);
         this.border2 = this.physics.add.existing(this.add.rectangle(0, this.h, this.w * 4, 10, 0x00000).setOrigin(0, 1), true);
+
+        this.obstacle = this.physics.add.existing(this.add.rectangle(this.w / 2, this.h / 2, 50, 50, 0x000FF).setOrigin(0, 1), true);
 
         this.player1 = this.physics.add.image(75, 100, 'pc').setScale(.5)
         this.player2 = this.physics.add.image(75, 400, 'pc').setTintFill(0x00FF00).setScale(.5);
@@ -41,6 +43,7 @@ class Platform extends Phaser.Scene {
         this.cam2.setDeadzone(250, this.h / 2);
 
         this.physics.add.collider(this.player1, this.border1);
+        this.physics.add.collider(this.player1, this.obstacle);
         this.physics.add.collider(this.player2, this.border2);
         this.physics.add.collider(this.player2, this.border1);
         this.cursors = this.input.keyboard.createCursorKeys();
