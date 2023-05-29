@@ -4,8 +4,8 @@ class Platform extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('bg', './assets/bg placeholder.jpg');
-        this.load.image('pc', './assets/pc_placeholder.png');
+        this.load.image('bg', '../../assets/bg placeholder.jpg');
+        this.load.image('pc', '../../assets/pc_placeholder.png');
     }
 
     create() {
