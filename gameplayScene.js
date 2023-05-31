@@ -10,7 +10,7 @@ class GameplayScene extends Phaser.Scene {
         this.load.spritesheet("p1", "./assets/characterA-spritesheet.tps", {frameWidth: 40, frameHeight: 40});
 
         this.load.image('pc', './assets/CharacterA-0 copy.png');
-        // this.load.image('star', )
+        this.load.image('star', './assets/star_placeholder.png');
 
     }
 
@@ -44,14 +44,19 @@ class GameplayScene extends Phaser.Scene {
         this.border.add(this.add.rectangle(0, this.h / 2, this.w * 4, 10, 0x000000).setOrigin(0, 0.5));
         this.border.add(this.add.rectangle(0, 0, this.w * 4, 10, 0x000000).setOrigin(0, 0));
         this.border.add(this.add.rectangle(0, 0, 10, this.h * 2, 0x000000).setOrigin(0, 0));
-        this.border.add(this.add.rectangle(this.w * 2, 0, 10, this.h * 2, 0x000000).setOrigin(1, 0));
+        this.border.add(this.add.rectangle(this.w * 2 + 150, 0, 10, this.h * 2, 0x000000).setOrigin(1, 0));
 
-        this.add.rectangle(this.w * 2, 0, 100, this.h * 2, 0xf0c369).setOrigin(1, 0);
+        // all stars
+        this.stars = this.physics.add.group({allowGravity: false});
+        // Collectable stars for top half
+        this.topStars = this.physics.add.group({allowGravity: false});
+        // Collectable stars from bottom half
+        this.bottomStars = this.physics.add.group({allowGravity: false});
 
         // Players
         this.players = this.physics.add.group();
-        this.player1 = this.players.create(150, 200, 'pc').setScale(10);
-        this.player2 = this.players.create(150, 800, 'pc').setTintFill(0x00FF00).setScale(10);
+        this.player1 = this.players.create(150, 200, 'pc').setOffset(10, 7).setScale(6).setSize(75/6, 150/6, false);
+        this.player2 = this.players.create(150, 800, 'pc').setOffset(10, 7).setScale(6).setSize(75/6, 150/6, false).setTint(0x87cdFF);
 
         // Tell cameras to follow players
         this.cam1.startFollow(this.player1, false, 1, 1, 0, 106);
@@ -61,15 +66,46 @@ class GameplayScene extends Phaser.Scene {
         this.cam1.setDeadzone(250, this.h / 2);
         this.cam2.setDeadzone(250, this.h / 2);
 
-        // Collissions
+        // Obstacles
+        this.obstacles = this.physics.add.group({allowGravity: false, immovable: true});
+
+        //Exit gates
+        this.gates = this.physics.add.group({allowGravity: false, immovable: true});
+        this.gate1 = this.add.rectangle(this.w * 2 - 100, 0, 10, this.h / 2, 0xFF0000).setOrigin(1, 0);
+        this.gate2 = this.add.rectangle(this.w * 2 - 100, this.h / 2, 10, this.h / 2, 0x00FF00).setOrigin(1, 0);
+        this.gates.addMultiple([this.gate1, this.gate2]);
+
+        // Collisions
         this.physics.add.collider(this.players, this.border);
         this.physics.add.collider(this.players, this.obstacles);
+        this.physics.add.collider(this.players, this.gates);
 
+        this.physics.add.overlap(this.players, this.stars, this.collectStar, null, this);
         // Register Keyboard Controls
         this.cursors = this.input.keyboard.createCursorKeys();
         // console.log(this.width * 2 - 100);
         this.onEnter();
     }
+
+    addStar(x, y, side) {
+        let star = this.stars.create(x, y, 'star');
+        if (side == "top") {
+            this.topStars.add(star);
+        } else if (side == "bottom") {
+            this.bottomStars.add(star);
+        }
+    }
+
+    collectStar(player, star) {
+        star.disableBody(true, true);
+        if (this.topStars.contains(star) && this.topStars.countActive() == 0) {
+            this.gates.remove(this.gate2, true, true);
+        }
+        else if (this.bottomStars.contains(star) && this.topStars.countActive() == 0) {
+            this.gates.remove(this.gate1, true, true);
+        }
+    }
+
 
     update() {
         const { left, right, up } = this.cursors;
@@ -94,7 +130,18 @@ class GameplayScene extends Phaser.Scene {
             this.player2.setVelocityY(-600); // Jump
         }
 
-        if (this.player1.x > this.w * 2 - 100 && this.player2.x > this.w * 2 - 100) {
+        if (this.topStars.countActive() == 0) { // All top stars collected check
+            // console.log("removed");
+            // this.gates.remove(this.gate2, true, true); // Open bottom gate
+            // this.gate2.destroy();
+        }
+
+        if (this.topStars.countActive() == 0) { // All bottom stars collected check
+            // this.gate1.disableBody(true, true); // Open top gate
+        }
+
+        // If players are both off screen, proceed to narrative scene
+        if (this.player1.x > this.w * 2 + 100 && this.player2.x > this.w * 2 - 100) { 
             this.scene.start('narrative');
         }
     }
