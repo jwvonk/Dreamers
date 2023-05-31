@@ -5,10 +5,18 @@ class Platform extends Phaser.Scene {
 
     preload() {
         this.load.image('bg', '../../assets/bg placeholder.jpg');
-        this.load.image('pc', '../../assets/pc_placeholder.png');
+
+        // TODO: Change file name in path
+        this.load.spritesheet("p1", "../../assets/characterA-spritesheet.tps", {frameWidth: 40, frameHeight: 40});
+
+        this.load.image('pc', '../../assets/CharacterA-0 copy.png');
+
     }
 
     create() {
+        // TODO: test each sprite in sheet by changing last number below
+        this.add.sprite(400, 300, "p1", 1);
+
         // All dimensions/scales should be written in terms of these
         this.w = this.game.config.width;
         this.h = this.game.config.height;
@@ -41,10 +49,12 @@ class Platform extends Phaser.Scene {
         this.obstacles = this.physics.add.group({allowGravity: false, immovable: true})
         this.obstacles.add(this.add.rectangle(this.w / 2, this.h / 2, 100, 100, 0x000FF).setOrigin(0, 1));
 
+        this.add.rectangle(this.w * 2, 0, 100, this.h * 2, 0xf0c369).setOrigin(1, 0);
+
         // Players
         this.players = this.physics.add.group();
-        this.player1 = this.players.create(150, 200, 'pc')
-        this.player2 = this.players.create(150, 800, 'pc').setTintFill(0x00FF00)
+        this.player1 = this.players.create(150, 200, 'pc').setScale(10);
+        this.player2 = this.players.create(150, 800, 'pc').setTintFill(0x00FF00).setScale(10);
 
         // Tell cameras to follow players
         this.cam1.startFollow(this.player1, false, 1, 1, 0, 106);
@@ -60,6 +70,7 @@ class Platform extends Phaser.Scene {
 
         // Register Keyboard Controls
         this.cursors = this.input.keyboard.createCursorKeys();
+        // console.log(this.width * 2 - 100);
         
     }
 
@@ -85,6 +96,30 @@ class Platform extends Phaser.Scene {
         {
             this.player2.setVelocityY(-600); // Jump
         }
+
+        if (this.player1.x > this.w * 2 - 100 && this.player2.x > this.w * 2 - 100) {
+            this.scene.start('narrative');
+        }
+    }
+}
+
+class Narrative extends Phaser.Scene {
+    constructor() {
+        super('narrative');
+    }
+    create() {
+        this.text = this.add.text(50, 50, "Blah Blah Blah\nBlah Blah Blah").setFontSize(50);
+        const fx = this.text.preFX.addReveal(.1, 0, 1);
+
+        this.tweens.add({
+            targets: fx,
+            progress: 1,
+            hold: 500,
+            duration: 3000
+        });
+
+        this.add.text(50, 200, "Click to proceed.").setFontSize(20);
+        this.input.on('pointerdown', () => this.scene.start('platform'));
     }
 }
 
@@ -105,7 +140,7 @@ let config = {
             debug: true
         }
     },
-    scene: [Platform]
+    scene: [Platform, Narrative]
 }
 
 let game = new Phaser.Game(config);
