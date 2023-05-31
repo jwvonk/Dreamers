@@ -1,15 +1,23 @@
-class Platform extends Phaser.Scene {
+class GameplayScene extends Phaser.Scene {
     constructor() {
-        super('platform');
+        super('gameplay');
     }
 
     preload() {
-        this.load.image('bg', '../../assets/bg placeholder.jpg');
-        this.load.image('pc', '../../assets/CharacterA-0 copy.png');
+        this.load.image('bg', './assets/bg placeholder.jpg');
+
+        // TODO: Change file name in path
+        this.load.spritesheet("p1", "./assets/characterA-spritesheet.tps", {frameWidth: 40, frameHeight: 40});
+
+        this.load.image('pc', './assets/CharacterA-0 copy.png');
+        // this.load.image('star', )
 
     }
 
     create() {
+        // TODO: test each sprite in sheet by changing last number below
+        this.add.sprite(400, 300, "p1", 1);
+
         // All dimensions/scales should be written in terms of these
         this.w = this.game.config.width;
         this.h = this.game.config.height;
@@ -38,10 +46,6 @@ class Platform extends Phaser.Scene {
         this.border.add(this.add.rectangle(0, 0, 10, this.h * 2, 0x000000).setOrigin(0, 0));
         this.border.add(this.add.rectangle(this.w * 2, 0, 10, this.h * 2, 0x000000).setOrigin(1, 0));
 
-        // Obstacles
-        this.obstacles = this.physics.add.group({allowGravity: false, immovable: true})
-        this.obstacles.add(this.add.rectangle(this.w / 2, this.h / 2, 100, 100, 0x000FF).setOrigin(0, 1));
-
         this.add.rectangle(this.w * 2, 0, 100, this.h * 2, 0xf0c369).setOrigin(1, 0);
 
         // Players
@@ -64,7 +68,7 @@ class Platform extends Phaser.Scene {
         // Register Keyboard Controls
         this.cursors = this.input.keyboard.createCursorKeys();
         // console.log(this.width * 2 - 100);
-        
+        this.onEnter();
     }
 
     update() {
@@ -94,46 +98,9 @@ class Platform extends Phaser.Scene {
             this.scene.start('narrative');
         }
     }
-}
 
-class Narrative extends Phaser.Scene {
-    constructor() {
-        super('narrative');
-    }
-    create() {
-        this.text = this.add.text(50, 50, "Blah Blah Blah\nBlah Blah Blah").setFontSize(50);
-        const fx = this.text.preFX.addReveal(.1, 0, 1);
-
-        this.tweens.add({
-            targets: fx,
-            progress: 1,
-            hold: 500,
-            duration: 3000
-        });
-
-        this.add.text(50, 200, "Click to proceed.").setFontSize(20);
-        this.input.on('pointerdown', () => this.scene.start('platform'));
+    onEnter() {
+        console.warn('This GameplayScene did not implement onEnter():', this.constructor.name);
     }
 }
 
-
-let config = {
-    type: Phaser.WEBGL,
-    scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 1920,
-        height: 1200
-    },
-    backgroundColor: 0x000000,
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: {y: 1200},
-            debug: true
-        }
-    },
-    scene: [Platform, Narrative]
-}
-
-let game = new Phaser.Game(config);
