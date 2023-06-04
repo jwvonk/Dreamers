@@ -4,9 +4,16 @@ class Level1 extends GameplayScene {
     }
 
     onEnter() {
-        this.obstacles.add(this.add.rectangle(this.w / 2, this.h / 2, 100, 100, 0x000FF).setOrigin(0, 1));
+        let a = this.addObstacle(500, 2, "top");
+        let b = this.addObstacle(750, 2, "bottom");
 
-        this.addStar(500, 400, "top");
-        this.addStar(500, 900, "bottom");
+        this.setFollow(b, a);
+
+        this.addPlate(500, "bottom", a, "raise", false);
+
+
+
+
+
     }
 }
