@@ -146,7 +146,7 @@ class GameplayScene extends Phaser.Scene {
 
         this.load.spritesheet("p1", "CharacterA-300px.png", {frameWidth: 925 / 6, frameHeight: 177});
 
-        this.load.spritesheet('p2', 'CharacterB-300px.png', {frameWidth: 203/2, frameHeight: 507/3});
+        this.load.spritesheet('p2', 'characterB-300px.png', {frameWidth: 203/2, frameHeight: 507/3});
 
     }
 
