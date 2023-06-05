@@ -77,40 +77,34 @@ class GameplayScene extends Phaser.Scene {
         }
         if (plate.body.touching.up && !plate.getData("pressed")) {
             plate.setData("pressed", true);
-            switch (plate.getData("eff") ) {
-                case "raise":
-                    for (let i in plate.getData("target")) {
+            for (let i in plate.getData("eff")) {
+                switch (plate.getData("eff")[i]) {
+                    case "raise":
                         this.raiseObstacle(plate.getData("target")[i], plate.getData("dist")[i]);
-                    }
-                    if (plate.getData("tog")) {
-                        plate.setData("eff", "lower");
-                    }
-                    break;
-                case "lower":
-                    for (let i in plate.getData("target")) {
+                        if (plate.getData("tog")) {
+                            plate.getData("eff")[i] = "lower";
+                        }
+                        break;
+                    case "lower":
                         this.lowerObstacle(plate.getData("target")[i], plate.getData("dist")[i]);
-                    }
-                    if (plate.getData("tog")) {
-                        plate.setData("eff", "raise");
-                    }
-                    break;
-                case "extend":
-                    for (let target of plate.getData("target")) {
-                        this.extendObstacle(target);
-                    }
-                    if (plate.getData("tog")) {
-                        plate.setData("eff", "retract");
-                    }
-                    break;
-                case "retract":
-                    for (let target of plate.getData("target")) {
-                        this.retractObstacle(target);
-                    }
-                    if (plate.getData("tog")) {
-                        plate.setData("eff", "extend");
-                    }
-                default:
-                    break;
+                        if (plate.getData("tog")) {
+                            plate.getData("eff")[i] = "raise";
+                        }
+                        break;
+                    case "extend":
+                        this.extendObstacle(plate.getData("target")[i]);
+                        if (plate.getData("tog")) {
+                            plate.getData("eff")[i] = "retract";
+                        }
+                        break;
+                    case "retract":
+                            this.retractObstacle(plate.getData("target")[i]);
+                        if (plate.getData("tog")) {
+                            plate.getData("eff")[i] = "extend";
+                        }
+                    default:
+                        break;
+                }
             }
         }
     }
@@ -207,7 +201,7 @@ class GameplayScene extends Phaser.Scene {
         this.cam2.setDeadzone(250, this.h / 2);
 
         // Obstacles
-        this.obstacles = this.physics.add.group({dragX: 1000, bounce: 1});
+        this.obstacles = this.physics.add.group({dragX: 1000});
         this.plates = this.physics.add.group({allowGravity: false, immovable: true});
 
         // // all stars
@@ -219,9 +213,16 @@ class GameplayScene extends Phaser.Scene {
 
         // Collisions
         this.physics.add.collider(this.players, this.border);
+        this.physics.world.collide(this.players, this.border);
         this.physics.add.collider(this.players, this.obstacles);
+        this.physics.world.collide(this.players, this.obstacles);
         this.physics.add.collider(this.obstacles, this.border);
+        this.physics.world.collide(this.obstacles, this.border);
         this.physics.add.collider(this.obstacles, this.plates);
+        this.physics.world.collide(this.obstacles, this.plates);
+        this.physics.add.collider(this.obstacles, this.obstacles);
+        this.physics.world.collide(this.obstacles, this.obstacles);
+
 
         // this.physics.add.overlap(this.players, this.stars, this.collectStar, null, this);
 
@@ -315,19 +316,17 @@ class GameplayScene extends Phaser.Scene {
             if (plate.getData("pressed") && !(plate.body.touching.up)) {
                 // debugger;
                 if (!plate.getData("tog")) {
-                    switch (plate.getData("eff") ) {
-                        case "raise":
-                            for (let i in plate.getData("target")) {
+                    for (let i in plate.getData("eff")) {
+                        switch (plate.getData("eff")[i]) {
+                            case "raise":
                                 this.lowerObstacle(plate.getData("target")[i], plate.getData("dist")[i]);
-                            }
-                            break;
-                        case "lower":
-                            for (let i in plate.getData("target")) {
+                                break;
+                            case "lower":
                                 this.raiseObstacle(plate.getData("target")[i], plate.getData("dist")[i]);
-                            }
-                            break;
-                        default:
-                            break;
+                                break;
+                            default:
+                                break;
+                        }
                     }
                 }
                 plate.setData("pressed", false);

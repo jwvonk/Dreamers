@@ -26,14 +26,14 @@ class Level2 extends GameplayScene {
         let topOb2 = this.addObstacle(1900, 200, 1, false);
         this.addObstacle(1900, this.h - 250, 1, false);
 
-        this.addPlate(2200, this.h / 2 - 250, [topOb2], "raise", [150], true);
+        this.addPlate(2200, this.h / 2 - 250, [topOb2], ["raise"], [150], true);
 
         let topOb3 = this.addObstacle(2400, 200, 2, false);
-        this.addObstacle(2400, this.h - 250, 2, false);
+        this.addObstacle(2400, this.h - 250, 1, false);
 
-        this.addPlate(300, this.h - 250, [botGate1, topOb3], "lower", [300, 150], true);
+        this.addPlate(300, this.h - 250, [botGate1, topOb3], ["lower", "lower"], [300, 150], true);
 
-        this.addPlate(2600, this.h / 2 - 250, [botOb1], "raise", [150], true);
+        this.addPlate(2600, this.h / 2 - 250, [botOb1], ["raise"], [150], true);
 
 
     }
