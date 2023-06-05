@@ -4,7 +4,7 @@ class Level1 extends GameplayScene {
     }
 
     onEnter() {
-        this.scene.start('level3')
+        // this.scene.start('level3')
         let topOb1 = this.addObstacle(700, this.h / 2  - 5, 1);
         let botOb1 = this.addObstacle(600, this.h - 10, 1);
         this.setFollow(botOb1, topOb1);
