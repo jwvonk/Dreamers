@@ -24,6 +24,8 @@ class Level1 extends GameplayScene {
     }
 
     onTick() {
-        // console.log(this.botGate1.height, this.botGate1.body.height);
+        if (this.player1.x > this.w * 2 + 100 && this.player2.x > this.w * 2 - 100) { 
+            this.scene.start('level2');
+        }
     }
 }

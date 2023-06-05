@@ -301,9 +301,9 @@ class GameplayScene extends Phaser.Scene {
         // }
 
         // If players are both off screen, proceed to narrative scene
-        if (this.player1.x > this.w * 2 + 100 && this.player2.x > this.w * 2 - 100) { 
-            this.scene.start('level2');
-        }
+        // if (this.player1.x > this.w * 2 + 100 && this.player2.x > this.w * 2 - 100) { 
+        //     this.scene.start('level2');
+        // }
 
         for (let obj of this.obstacles.getChildren()) {
             let f = obj.getData("follow");
