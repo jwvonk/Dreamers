@@ -5,8 +5,43 @@ class NarrativeScene extends Phaser.Scene {
     create() {
         this.add.text(50, 1150, "Click to proceed.").setFontSize(20);
         this.onEnter();
+        this.input.keyboard.on('keydown-P', () => {
+            this.scene.pause();
+            this.scene.launch('pause');
+        });
+
+        this.input.keyboard.on('keydown-R', () => {
+            this.scene.restart();
+        });
+
+        this.input.keyboard.on('keydown-Q', () => {
+            this.scene.start("level1");
+        });
+
+        this.input.keyboard.on('keydown-W', () => {
+            this.scene.start("level2");
+        });
+
+        this.input.keyboard.on('keydown-E', () => {
+            this.scene.start("level3");
+        });
     }
     onEnter() {}
+}
+
+class Title extends NarrativeScene {
+    constructor() {
+        super("title")
+    }
+    preload() {
+        this.load.path = "assets/";
+        this.load.image("title", "purple and blue sky clouds-600px.png");
+    }
+    onEnter() {
+        this.add.image(1920/2, 1200/2, "title").setOrigin(.5, .5).setScale(3.2);
+        this.input.on('pointerdown', () => this.scene.start('intro'), this);
+    }
+
 }
 
 class Intro extends NarrativeScene {
@@ -102,6 +137,6 @@ class End extends NarrativeScene {
             duration: 6000
         });
 
-        this.input.on('pointerdown', () => this.scene.start('intro'), this);
+        this.input.on('pointerdown', () => this.scene.start('title'), this);
     }
 }
