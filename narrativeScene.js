@@ -1,13 +1,14 @@
 class NarrativeScene extends Phaser.Scene {
     constructor(key) {
         super(key);
+        this.key = key;
     }
     create() {
         this.add.text(50, 1150, "Click to proceed.").setFontSize(20);
         this.onEnter();
         this.input.keyboard.on('keydown-P', () => {
             this.scene.pause();
-            this.scene.launch('pause');
+            this.scene.launch('pause', {from: this.key});
         });
 
         this.input.keyboard.on('keydown-R', () => {

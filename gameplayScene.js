@@ -167,7 +167,7 @@ class GameplayScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-P', () => {
             this.scene.pause();
-            this.scene.launch('pause');
+            this.scene.launch('pause', {from: this.key});
         });
 
         this.input.keyboard.on('keydown-R', () => {
