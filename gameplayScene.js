@@ -1,6 +1,6 @@
 class GameplayScene extends Phaser.Scene {
-    constructor() {
-        super('gameplay');
+    constructor(key) {
+        super(key);
     }
 
     // Adds a shelf obstacle to the level
@@ -8,13 +8,8 @@ class GameplayScene extends Phaser.Scene {
     // height (int): height of the shelf, in tiles
     // side (str): either "top" for the top side, or "bottom" for the bottom side
     // pushable (bool): whether this shelf is movable by either player
-    addObstacle(x, height, side, pushable = true) {
-        let obstacle;
-        if (side == "top") {
-            obstacle = this.add.tileSprite(x, this.h / 2  - 5, 150, 150 * height, 'shelf');
-        } else if (side == "bottom") {
-            obstacle = this.add.tileSprite(x, this.h - 10, 150, 150 * height, 'shelf');
-        }
+    addObstacle(x, y, height, pushable = true) {
+        let obstacle = this.add.tileSprite(x, y, 150, 150 * height, 'shelf');
         obstacle.setOrigin(.5, 1);
         this.obstacles.add(obstacle);
         // console.log(this.obstacles.getChildren());
@@ -25,13 +20,8 @@ class GameplayScene extends Phaser.Scene {
     // Adds an immovable shelf gate to the level
     // x (float): x position of the shelf, in pixels
     // side (str): either "top" for the top side, or "bottom" for the bottom side
-    addGate(x, side) {
-        let gate;
-        if (side == "top") {
-            gate = this.add.tileSprite(x, this.h / 2  - 5, 150, 450, 'shelf');
-        } else if (side == "bottom") {
-            gate = this.add.tileSprite(x, this.h - 5, 150, 450, 'shelf');
-        }
+    addGate(x, y) {
+        let gate = this.add.tileSprite(x, y, 150, 345, 'shelf');
         gate.setOrigin(.5, 1);
         this.gates.add(gate);
         gate.body.pushable = false;
@@ -42,7 +32,7 @@ class GameplayScene extends Phaser.Scene {
     // Makes obj2 immovable by the players, if not already
     setFollow(obj1, obj2) {
         obj2.body.pushable = false;
-        obj2.body.setAllowGravity(false);
+        // obj2.body.setAllowGravity(false);
         obj2.setDataEnabled();
         obj2.setData('follow', obj1);
         // console.log(ob1);
@@ -53,23 +43,28 @@ class GameplayScene extends Phaser.Scene {
     // Helper function
     // Reduces the height of obstacles by 1 tile and lowers gates completely
     lowerObstacle(obstacle) {
+        // console.log(obstacle.body.height);
         if (this.obstacles.contains(obstacle)) {
             if (obstacle.height > 150) {
                 obstacle.height -= 150;
+                obstacle.body.setSize(obstacle.width, obstacle.height);
             }
         } else if (this.gates.contains(obstacle)) {
             obstacle.height = 0;
+            obstacle.body.setEnable(false);
         }
     }
     // Helper function
     // Increases the height of obstacles by 1 tile and raises gates completely
     raiseObstacle(obstacle) {
         if (this.obstacles.contains(obstacle)) {
-            if (obstacle.height < 450) {
+            if (obstacle.height < 345) {
                 obstacle.height += 150;
+                obstacle.body.setSize(obstacle.width, obstacle.height);
             }
         } else if (this.gates.contains(obstacle)) {
-            obstacle.height = 450;
+            obstacle.height = 345;
+            obstacle.body.setEnable(true);
         }
     }
 
@@ -80,13 +75,8 @@ class GameplayScene extends Phaser.Scene {
     // eff (str): whether the plate raises or lowers the shelf on first press
     //      either "raise" or "lower"
     // tog (bool): whether or not this plate is a toggle
-    addPlate(x, side, target, eff, tog = false) {
-        let plate;
-        if (side == "top") {
-            plate = this.plates.create(x, this.h / 2  - 5, 'book');
-        } else if (side == "bottom") {
-            plate = this.plates.create(x, this.h - 5, 'book');
-        }
+    addPlate(x, y, target, eff, tog = false) {
+        let plate = this.plates.create(x, y, 'book');
         plate.setOrigin(.5, 1).setScale(5)
         plate.setDataEnabled();
         plate.setData({target: target, eff: eff, tog: tog, pressed: false});
@@ -95,42 +85,32 @@ class GameplayScene extends Phaser.Scene {
 
     // helper function
     handlePlate(player, plate) {
+        // debugger;
+        if (((plate.body.touching.left && player.body.touching.right) || (plate.body.touching.right && player.body.touching.left)) && player.body.touching.down) {
+            player.y -= 40;
+        }
         if (plate.body.touching.up && !plate.getData("pressed")) {
             plate.setData("pressed", true);
-            let target = plate.getData("target");
             switch (plate.getData("eff") ) {
                 case "raise":
-                    this.raiseObstacle(target);
+                    for (let target of plate.getData("target")) {
+                        this.raiseObstacle(target);
+                    }
                     if (plate.getData("tog")) {
                         plate.setData("eff", "lower");
                     }
-                    this.time.delayedCall(100, () => {
-                        if (!plate.body.touching.up) {
-                            if (!plate.getData("tog")) {
-                                this.lowerObstacle(target);
-                            }
-                            plate.setData("pressed", false);
-                        }
-                    }, [], this);
                     break;
                 case "lower":
-                    this.lowerObstacle(target);
+                    for (let target of plate.getData("target")) {
+                        this.lowerObstacle(target);
+                    }
                     if (plate.getData("tog")) {
                         plate.setData("eff", "raise");
                     }
-                    this.time.delayedCall(100, () => {
-                        if (!plate.body.touching.up) {
-                            if (!plate.getData("tog")) {
-                                this.lowerObstacle(target);
-                            }
-                            plate.setData("pressed", false);
-                        }
-                    }, [], this);
                     break;
                 default:
                     break;
             }
-            
         }
     }
 
@@ -164,6 +144,15 @@ class GameplayScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-R', () => {
             this.scene.restart();
         });
+
+        this.input.keyboard.on('keydown-Q', () => {
+            this.scene.start("level1");
+        });
+
+        this.input.keyboard.on('keydown-W', () => {
+            this.scene.start("level2");
+        });
+
 
         // Set up background image instances
         for (let x = 0; x < this.w * 2; x += 600) {
@@ -315,7 +304,7 @@ class GameplayScene extends Phaser.Scene {
 
         // If players are both off screen, proceed to narrative scene
         if (this.player1.x > this.w * 2 + 100 && this.player2.x > this.w * 2 - 100) { 
-            this.scene.start('narrative');
+            this.scene.start('level2');
         }
 
         for (let obj of this.obstacles.getChildren()) {
@@ -327,13 +316,18 @@ class GameplayScene extends Phaser.Scene {
 
         for (let plate of this.plates.getChildren()) {
             if (plate.getData("pressed") && !(plate.body.touching.up)) {
+                // debugger;
                 if (!plate.getData("tog")) {
                     switch (plate.getData("eff") ) {
                         case "raise":
-                            this.lowerObstacle(plate.getData("target"));
+                            for (let target of plate.getData("target")) {
+                                this.lowerObstacle(target);
+                            }
                             break;
                         case "lower":
-                            this.raiseObstacle(plate.getData("target"));
+                            for (let target of plate.getData("target")) {
+                                this.raiseObstacle(target);
+                            }
                             break;
                         default:
                             break;
@@ -342,10 +336,14 @@ class GameplayScene extends Phaser.Scene {
                 plate.setData("pressed", false);
             }
         }
+        this.onTick()
     }
 
     onEnter() {
         console.warn('This GameplayScene did not implement onEnter():', this.constructor.name);
+    }
+    onTick() {
+
     }
 }
 
