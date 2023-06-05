@@ -213,13 +213,13 @@ class GameplayScene extends Phaser.Scene {
 
         // Collisions
         this.physics.add.collider(this.players, this.border);
-        this.physics.world.collide(this.players, this.border);
+        // this.physics.world.collide(this.players, this.border);
         this.physics.add.collider(this.players, this.obstacles);
-        this.physics.world.collide(this.players, this.obstacles);
+        // this.physics.world.collide(this.players, this.obstacles);
         this.physics.add.collider(this.obstacles, this.border);
-        this.physics.world.collide(this.obstacles, this.border);
-        this.physics.add.collider(this.obstacles, this.plates);
-        this.physics.world.collide(this.obstacles, this.plates);
+        // this.physics.world.collide(this.obstacles, this.border);
+        // this.physics.add.collider(this.obstacles, this.plates);
+        // this.physics.world.collide(this.obstacles, this.plates);
         this.physics.add.collider(this.obstacles, this.obstacles);
         this.physics.world.collide(this.obstacles, this.obstacles);
 
