@@ -184,7 +184,7 @@ class GameplayScene extends Phaser.Scene {
         this.pushSound = this.sound.add('push', {loop: true, volume: .5});
         this.pushSound.play();
         this.pushSound.pause();
-
+    
         // Set up background image instances
         for (let x = 0; x < this.w * 2; x += 600) {
             this.add.image(x, 0, 'bg1').setOrigin(0, 0).setScale(600/768)

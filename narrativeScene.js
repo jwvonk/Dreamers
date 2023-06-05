@@ -36,10 +36,12 @@ class Title extends NarrativeScene {
     preload() {
         this.load.path = "assets/";
         this.load.image("title", "purple and blue sky clouds-600px.png");
+        this.load.audio("bgm", "Viandanze.mp3");
     }
     onEnter() {
         this.add.image(1920/2, 1200/2, "title").setOrigin(.5, .5).setScale(3.2);
         this.input.on('pointerdown', () => this.scene.start('intro'), this);
+        this.sound.add("bgm", {loop: true}).play();
     }
 
 }
