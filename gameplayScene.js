@@ -9,11 +9,19 @@ class GameplayScene extends Phaser.Scene {
     // side (str): either "top" for the top side, or "bottom" for the bottom side
     // pushable (bool): whether this shelf is movable by either player
     addObstacle(x, y, height, pushable = true) {
-        let obstacle = this.add.tileSprite(x, y, 150, 150 * height, 'shelf');
-        obstacle.setOrigin(.5, 1);
-        this.obstacles.add(obstacle);
+        let obstacle;
+        if (height == 0) {
+            obstacle = this.add.tileSprite(x, y, 150, 1, 'shelf');
+            obstacle.setOrigin(.5, 1);
+            obstacle.height = 0;
+        } else {
+            obstacle = this.add.tileSprite(x, y, 150, 150 * height, 'shelf');
+            obstacle.setOrigin(.5, 1);
+            this.obstacles.add(obstacle);
+            obstacle.body.pushable = pushable;
+        }
+        // debugger;
         // console.log(this.obstacles.getChildren());
-        obstacle.body.pushable = pushable;
         return obstacle;
     }
 
@@ -32,26 +40,40 @@ class GameplayScene extends Phaser.Scene {
     // Helper function
     // Reduces the height of obstacles by 1 tile and lowers gates completely
     lowerObstacle(obstacle, dist) {
-        if (obstacle.height > dist) {
+        if (obstacle.height >= dist) {
             obstacle.height -= dist;
-            obstacle.body.setSize(obstacle.width, obstacle.height);
-        }
-    }
+            if (obstacle.height == 0){
+                obstacle.body.destroy();
+                obstacle.body = null;
+            } else {
+                obstacle.body.setSize(obstacle.width, obstacle.height);
+            }
+        }    }
     extendObstacle(obstacle) {
         obstacle.width += 150;
         obstacle.body.setSize(obstacle.width, obstacle.height);
     }
-    retractObstacle(obstacle) {
-        if (obstacle.width > 150) {
-            obstacle.width -= 150;
-            obstacle.body.setSize(obstacle.width, obstacle.height);
-        }
-    }
+    // retractObstacle(obstacle) {
+    //     if (obstacle.width >= 150) {
+    //         obstacle.width -= 150;
+    //         if obstacle 
+    //         obstacle.body.setSize(obstacle.width, obstacle.height);
+    //     }
+    // }
     // Helper function
     // Increases the height of obstacles by 1 tile and raises gates completely
     raiseObstacle(obstacle, dist) {
-        obstacle.height += dist;
-        obstacle.body.setSize(obstacle.width, obstacle.height);
+        // console.log(obstacle);
+        // console.log(obstacle.height);
+        if (obstacle.height == 0) {
+            obstacle.height += dist;
+            this.obstacles.add(obstacle);
+            obstacle.body.pushable = false;
+        } else {
+            // console.log("b");
+            obstacle.height += dist;
+            obstacle.body.setSize(obstacle.width, obstacle.height);
+        }
     }
 
     // Adds a book pressure plate to the level
@@ -148,6 +170,10 @@ class GameplayScene extends Phaser.Scene {
             this.scene.start("level2");
         });
 
+        this.input.keyboard.on('keydown-E', () => {
+            this.scene.start("level3");
+        });
+
 
         // Set up background image instances
         for (let x = 0; x < this.w * 2; x += 600) {
@@ -201,7 +227,7 @@ class GameplayScene extends Phaser.Scene {
         this.cam2.setDeadzone(250, this.h / 2);
 
         // Obstacles
-        this.obstacles = this.physics.add.group({dragX: 1000});
+        this.obstacles = this.physics.add.group({dragX: 1000, pushable: false});
         this.plates = this.physics.add.group({allowGravity: false, immovable: true});
 
         // // all stars
@@ -220,8 +246,8 @@ class GameplayScene extends Phaser.Scene {
         // this.physics.world.collide(this.obstacles, this.border);
         // this.physics.add.collider(this.obstacles, this.plates);
         // this.physics.world.collide(this.obstacles, this.plates);
-        this.physics.add.collider(this.obstacles, this.obstacles);
-        this.physics.world.collide(this.obstacles, this.obstacles);
+        this.collider = this.physics.add.collider(this.obstacles, this.obstacles);
+        // this.physics.world.collide(this.obstacles, this.obstacles);
 
 
         // this.physics.add.overlap(this.players, this.stars, this.collectStar, null, this);

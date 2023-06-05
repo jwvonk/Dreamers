@@ -16,7 +16,7 @@ class Level2 extends GameplayScene {
         let botOb1 = this.addObstacle(800, this.h - 250, 2);
         this.setFollow(botOb1, topOb1);
 
-        let topGate = this.addObstacle(1500, this.h / 2 - 150, .1, false);
+        let topGate = this.addObstacle(1500, this.h / 2 - 150, 0, false);
 
         this.addPlate(500, this.h - 10, [topGate, botOb1], ["raise", "lower"], [350, 150], true);
 
@@ -26,7 +26,7 @@ class Level2 extends GameplayScene {
 
         this.addPlate(1900, this.h / 2 + 5, [botOb2], ["raise"], [150], true);
 
-        let topOb3 = this.addObstacle(2600, this.h / 2 + 5, 3, false);
+        let topOb3 = this.addObstacle(2600, this.h / 2 - 5, 3, false);
 
         this.addPlate(2100, this.h + 10, [topOb3], ["lower"], [445], false);
 
@@ -52,7 +52,7 @@ class Level2 extends GameplayScene {
     }
     onTick() {
         if (this.player1.x > this.w * 2 + 100 && this.player2.x > this.w * 2 - 100) { 
-            this.scene.start('level2');
+            this.scene.start('dialogue2');
         }
     }
 }
