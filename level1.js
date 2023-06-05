@@ -18,8 +18,8 @@ class Level1 extends GameplayScene {
 
         this.addObstacle(2000, 1, "bottom", false);
 
-        let topOb2 = this.addObstacle(2500, 1, "top");
-        let botOb2 = this.addObstacle(2500, 2, "bottom");
+        let topOb2 = this.addObstacle(2600, 1, "top");
+        let botOb2 = this.addObstacle(2600, 2, "bottom");
         this.setFollow(topOb2, botOb2);
 
     }

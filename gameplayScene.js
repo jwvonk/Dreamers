@@ -87,7 +87,7 @@ class GameplayScene extends Phaser.Scene {
         } else if (side == "bottom") {
             plate = this.plates.create(x, this.h - 5, 'book');
         }
-        plate.setOrigin(.5, 1);
+        plate.setOrigin(.5, 1).setScale(5)
         plate.setDataEnabled();
         plate.setData({target: target, eff: eff, tog: tog, pressed: false});
         return plate;
@@ -141,7 +141,7 @@ class GameplayScene extends Phaser.Scene {
         this.load.image('bg2', '2d library.png');
         this.load.image('bg3', 'pixel art library.png');
 
-        this.load.image('book', 'book_placeholder.png');
+        this.load.image('book', 'Book Plate.png');
         this.load.image('shelf', 'bookshelf-240px.png')
 
         this.load.spritesheet("p1", "CharacterA-300px.png", {frameWidth: 925 / 6, frameHeight: 177});
