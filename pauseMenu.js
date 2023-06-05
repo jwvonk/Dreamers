@@ -1,7 +1,6 @@
 class Pause extends Phaser.Scene {
-    constructor(key) {
-        super("pause");
-        this.key = key;
+    constructor() {
+        super('pause');
     }
 
     preload() {

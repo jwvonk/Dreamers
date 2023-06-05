@@ -25,9 +25,27 @@ class NarrativeScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-E', () => {
             this.scene.start("level3");
         });
+
+        this.input.keyboard.on('keydown-M', () => {
+            if (g_bgm.isPlaying) {
+                g_bgm.pause();
+            } else {
+                g_bgm.resume();
+            }
+        });
+
+        this.input.keyboard.on('keydown-F', () => {
+            if (this.scale.isFullscreen) {
+                this.scale.stopFullscreen();
+            } else {
+                this.scale.startFullscreen();
+            }
+        });
     }
     onEnter() {}
 }
+
+let g_bgm;
 
 class Title extends NarrativeScene {
     constructor() {
@@ -41,7 +59,8 @@ class Title extends NarrativeScene {
     onEnter() {
         this.add.image(1920/2, 1200/2, "title").setOrigin(.5, .5).setScale(3.2);
         this.input.on('pointerdown', () => this.scene.start('intro'), this);
-        this.sound.add("bgm", {loop: true}).play();
+        g_bgm = this.sound.add("bgm", {loop: true});
+        g_bgm.play();
     }
 
 }

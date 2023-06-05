@@ -1,6 +1,7 @@
 class GameplayScene extends Phaser.Scene {
     constructor(key) {
         super(key);
+        this.key = key;
     }
 
     // Adds a shelf obstacle to the level
@@ -85,7 +86,7 @@ class GameplayScene extends Phaser.Scene {
     // tog (bool): whether or not this plate is a toggle
     addPlate(x, y, target, eff, dist, tog = false) {
         let plate = this.plates.create(x, y, 'book');
-        plate.setOrigin(.5, 1).setScale(5)
+        plate.setOrigin(.5, 1).setScale(5);
         plate.setDataEnabled();
         plate.setData({target: target, eff: eff, tog: tog, dist: dist, pressed: false});
         return plate;
@@ -156,6 +157,14 @@ class GameplayScene extends Phaser.Scene {
         this.h = this.game.config.height;
         this.s = this.game.config.width * 0.01;
 
+        this.jumpSound = this.sound.add('jump');
+        this.walkSound = this.sound.add('walk', {loop: true, rate: 1.7, volume: .5});
+        this.walkSound.play();
+        this.walkSound.pause();
+        this.pushSound = this.sound.add('push', {loop: true, volume: .5});
+        this.pushSound.play();
+        this.pushSound.pause();
+
         this.input.keyboard.on('keydown-P', () => {
             this.scene.pause();
             this.scene.launch('pause');
@@ -176,14 +185,28 @@ class GameplayScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-E', () => {
             this.scene.start("level3");
         });
+        
+        this.input.keyboard.on('keydown-M', () => {
+            if (g_bgm.isPlaying) {
+                g_bgm.pause();
+            } else {
+                g_bgm.resume();
+            }
+        });
 
-        this.jumpSound = this.sound.add('jump');
-        this.walkSound = this.sound.add('walk', {loop: true, rate: 1.7, volume: .5});
-        this.walkSound.play();
-        this.walkSound.pause();
-        this.pushSound = this.sound.add('push', {loop: true, volume: .5});
-        this.pushSound.play();
-        this.pushSound.pause();
+        this.input.keyboard.on('keydown-F', () => {
+            if (this.scale.isFullscreen) {
+                this.scale.stopFullscreen();
+            } else {
+                this.scale.startFullscreen();
+            }
+        });
+
+        this.sfx = true;
+
+        this.input.keyboard.on('keydown-S', () => {
+            this.sfx = !this.sfx;
+        });
     
         // Set up background image instances
         for (let x = 0; x < this.w * 2; x += 600) {
@@ -303,7 +326,7 @@ class GameplayScene extends Phaser.Scene {
             this.player1.play('player1Walk', true);
             this.player2.setFlip(true);
             this.player2.play('player2Walk', true);
-            if (this.player1.body.touching.down || this.player2.body.touching.down) {
+            if ((this.player1.body.touching.down || this.player2.body.touching.down) && this.sfx) {
                 this.walkSound.resume();
             }
         }
@@ -313,7 +336,7 @@ class GameplayScene extends Phaser.Scene {
             this.player1.play('player1Walk', true);
             this.player2.setFlip(false);
             this.player2.play('player2Walk', true);
-            if (this.player2.body.touching.down || this.player2.body.touching.down) {
+            if ((this.player2.body.touching.down || this.player2.body.touching.down) && this.sfx) {
                 this.walkSound.resume();
             }
             
@@ -329,14 +352,18 @@ class GameplayScene extends Phaser.Scene {
         if (up.isDown && this.player1.body.touching.down) // Player1 Grounded Check
         {
             this.player1.setVelocityY(-650); // Jump
-            this.jumpSound.play();
+            if (this.sfx) {
+                this.jumpSound.play();
+            }
             this.walkSound.pause();
         }
 
         if (up.isDown && this.player2.body.touching.down) // Player2 Grounded Check
         {
             this.player2.setVelocityY(-650); // Jump
-            this.jumpSound.play();
+            if (this.sfx) {
+                this.jumpSound.play();
+            }
             this.walkSound.pause();
         }
 
@@ -361,7 +388,7 @@ class GameplayScene extends Phaser.Scene {
             if (f) {
                 obj.body.velocity.x = f.body.velocity.x;
             }
-            if (obj.body && obj.body.velocity.x != 0 && obj.body.touching.down) {
+            if (obj.body && obj.body.velocity.x != 0 && obj.body.touching.down && this.sfx) {
                 this.pushSound.resume();
             }
         }
