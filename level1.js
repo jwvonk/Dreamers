@@ -27,6 +27,8 @@ class Level1 extends GameplayScene {
 
     onTick() {
         if (this.player1.x > this.w * 2 + 100 && this.player2.x > this.w * 2 - 100) { 
+            this.jumpSound.pause();
+            this.walkSound.pause();
             this.scene.start('dialogue1');
         }
     }
