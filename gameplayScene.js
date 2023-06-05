@@ -139,11 +139,14 @@ class GameplayScene extends Phaser.Scene {
         this.load.image('bg3', 'pixel art library.png');
 
         this.load.image('book', 'Book Plate.png');
-        this.load.image('shelf', 'bookshelf-240px.png')
+        this.load.image('shelf', 'bookshelf-240px.png');
 
         this.load.spritesheet("p1", "CharacterA-300px.png", {frameWidth: 925 / 6, frameHeight: 177});
-
         this.load.spritesheet('p2', 'characterB-300px.png', {frameWidth: 203/2, frameHeight: 507/3});
+
+        this.load.audio("jump", "jump.mp3");
+        this.load.audio("walk", "walk.mp3");
+        this.load.audio("push", "push.mp3");
 
     }
 
@@ -174,6 +177,13 @@ class GameplayScene extends Phaser.Scene {
             this.scene.start("level3");
         });
 
+        this.jumpSound = this.sound.add('jump');
+        this.walkSound = this.sound.add('walk', {loop: true, rate: 1.7, volume: .5});
+        this.walkSound.play();
+        this.walkSound.pause();
+        this.pushSound = this.sound.add('push', {loop: true, volume: .5});
+        this.pushSound.play();
+        this.pushSound.pause();
 
         // Set up background image instances
         for (let x = 0; x < this.w * 2; x += 600) {
@@ -182,6 +192,8 @@ class GameplayScene extends Phaser.Scene {
             this.add.image(x, this.h / 2, 'bg1').setOrigin(0, 0).setScale(600/768)
             .setFlip(x % 1200 ? true : false);
         }
+
+
 
         // Set up cameras
         this.cam1 = this.cameras.main; // Top camera
@@ -291,6 +303,9 @@ class GameplayScene extends Phaser.Scene {
             this.player1.play('player1Walk', true);
             this.player2.setFlip(true);
             this.player2.play('player2Walk', true);
+            if (this.player1.body.touching.down || this.player2.body.touching.down) {
+                this.walkSound.resume();
+            }
         }
         else if (right.isDown) {
             this.players.setVelocityX(500); // Move right
@@ -298,22 +313,31 @@ class GameplayScene extends Phaser.Scene {
             this.player1.play('player1Walk', true);
             this.player2.setFlip(false);
             this.player2.play('player2Walk', true);
+            if (this.player2.body.touching.down || this.player2.body.touching.down) {
+                this.walkSound.resume();
+            }
+            
 
         }
         else {
             this.players.setVelocityX(0); // Stand Still
             this.player1.setFrame(1)
             this.player2.setFrame(4)
+            this.walkSound.pause();
         }
 
         if (up.isDown && this.player1.body.touching.down) // Player1 Grounded Check
         {
             this.player1.setVelocityY(-650); // Jump
+            this.jumpSound.play();
+            this.walkSound.pause();
         }
 
         if (up.isDown && this.player2.body.touching.down) // Player2 Grounded Check
         {
             this.player2.setVelocityY(-650); // Jump
+            this.jumpSound.play();
+            this.walkSound.pause();
         }
 
         // if (this.topStars.countActive() == 0) { // All top stars collected check
@@ -331,10 +355,14 @@ class GameplayScene extends Phaser.Scene {
         //     this.scene.start('level2');
         // }
 
+        this.pushSound.pause()
         for (let obj of this.obstacles.getChildren()) {
             let f = obj.getData("follow");
             if (f) {
                 obj.body.velocity.x = f.body.velocity.x;
+            }
+            if (obj.body && obj.body.velocity.x != 0 && obj.body.touching.down) {
+                this.pushSound.resume();
             }
         }
 
